@@ -1,12 +1,26 @@
+"use client";
+
+import { useState, useTransition } from "react";
 import type { Settings } from "@/lib/types";
 import { updateSettings } from "./actions";
 
 export default function SettingsForm({ settings }: { settings: Settings }) {
+  const [isPending, startTransition] = useTransition();
+  const [saved, setSaved] = useState(false);
+
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      await updateSettings(formData);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    });
+  }
+
   return (
     <section>
       <h2 className="mb-3 text-base font-semibold text-zinc-50">Tier settings</h2>
       <form
-        action={updateSettings}
+        action={handleSubmit}
         className="flex flex-col gap-5 rounded-lg border border-zinc-800 bg-zinc-900/30 p-4"
       >
         <div className="flex flex-col gap-1.5">
@@ -59,13 +73,17 @@ export default function SettingsForm({ settings }: { settings: Settings }) {
           </label>
         </div>
 
-        <div>
+        <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="rounded-md bg-amber-500 px-4 py-2 font-semibold text-zinc-950 hover:bg-amber-400"
+            disabled={isPending}
+            className="rounded-md bg-amber-500 px-4 py-2 font-semibold text-zinc-950 hover:bg-amber-400 disabled:opacity-50"
           >
-            Save settings
+            {isPending ? "Saving..." : "Save settings"}
           </button>
+          {saved && (
+            <span className="text-sm font-medium text-green-400">Settings saved</span>
+          )}
         </div>
       </form>
     </section>
