@@ -1,18 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Player } from "@/lib/types";
+import type { Player, Settings } from "@/lib/types";
 import { computeTiers } from "@/lib/tiers";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("players")
-    .select("id, gamertag, rank_position")
-    .order("rank_position", { ascending: true });
 
-  const players = (data ?? []) as Player[];
-  const tiers = computeTiers(players);
+  const [{ data: playerData }, { data: settingsData }] = await Promise.all([
+    supabase.from("players").select("id, gamertag, rank_position").order("rank_position", { ascending: true }),
+    supabase.from("settings").select("tier_size, fill_direction").eq("id", 1).single(),
+  ]);
+
+  const settings: Settings = settingsData ?? { tier_size: 6, fill_direction: "bottom_up" };
+  const players = (playerData ?? []) as Player[];
+  const tiers = computeTiers(players, settings.tier_size, settings.fill_direction);
+
+  const footerText =
+    settings.fill_direction === "top_down"
+      ? `Tiers fill top-down in groups of ${settings.tier_size}; the bottom tier holds any remainder.`
+      : `Tiers fill bottom-up in groups of ${settings.tier_size}; the top tier holds any remainder.`;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -51,7 +58,7 @@ export default async function Home() {
       </main>
 
       <footer className="border-t border-zinc-800 px-6 py-6 text-center text-sm text-zinc-500">
-        Tiers are filled bottom-up in groups of six; the top tier holds any remainder.
+        {footerText}
       </footer>
     </div>
   );

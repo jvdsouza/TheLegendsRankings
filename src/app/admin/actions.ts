@@ -50,6 +50,23 @@ export async function deletePlayer(id: string) {
   revalidatePath("/");
 }
 
+export async function updateSettings(formData: FormData) {
+  const tierSize = parseInt(formData.get("tier_size") as string, 10);
+  const fillDirection = formData.get("fill_direction") as string;
+
+  if (!Number.isInteger(tierSize) || tierSize < 1 || tierSize > 20) return;
+  if (fillDirection !== "bottom_up" && fillDirection !== "top_down") return;
+
+  const supabase = await createClient();
+  await supabase
+    .from("settings")
+    .update({ tier_size: tierSize, fill_direction: fillDirection })
+    .eq("id", 1);
+
+  revalidatePath("/admin");
+  revalidatePath("/");
+}
+
 export async function movePlayer(id: string, direction: "up" | "down") {
   const supabase = await createClient();
 

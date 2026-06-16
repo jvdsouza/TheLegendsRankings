@@ -1,21 +1,26 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Player } from "@/lib/types";
+import type { Player, Settings } from "@/lib/types";
 import { computeTiers } from "@/lib/tiers";
 import { addPlayer } from "./actions";
 import PlayerRow from "./player-row";
+import SettingsForm from "./settings-form";
 
 export default async function AdminPage() {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("players")
-    .select("id, gamertag, rank_position")
-    .order("rank_position", { ascending: true });
 
-  const players = (data ?? []) as Player[];
-  const tiers = computeTiers(players);
+  const [{ data: playerData }, { data: settingsData }] = await Promise.all([
+    supabase.from("players").select("id, gamertag, rank_position").order("rank_position", { ascending: true }),
+    supabase.from("settings").select("tier_size, fill_direction").eq("id", 1).single(),
+  ]);
+
+  const settings: Settings = settingsData ?? { tier_size: 6, fill_direction: "bottom_up" };
+  const players = (playerData ?? []) as Player[];
+  const tiers = computeTiers(players, settings.tier_size, settings.fill_direction);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
+      <SettingsForm settings={settings} />
+
       <section>
         <h2 className="mb-3 text-base font-semibold text-zinc-50">Add player</h2>
         <form action={addPlayer} className="flex flex-col gap-2 sm:flex-row">
