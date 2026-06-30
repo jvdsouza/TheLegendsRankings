@@ -33,26 +33,44 @@ export default async function Home() {
           <p className="text-center text-zinc-500">No rankings yet. Check back soon.</p>
         ) : (
           <div className="flex flex-col gap-10">
-            {tiers.map((tier) => (
-              <section key={tier.tierNumber}>
-                <h2 className="mb-3 flex items-baseline gap-2 text-xl font-semibold text-amber-400">
-                  Tier {tier.tierNumber}
-                  <span className="text-sm font-normal text-zinc-500">
-                    {tier.players.length} player{tier.players.length === 1 ? "" : "s"}
-                  </span>
-                </h2>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {tier.players.map((player) => (
-                    <div
-                      key={player.id}
-                      className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
-                    >
-                      <p className="font-medium text-zinc-50">{player.gamertag}</p>
+            {tiers.map((tier) => {
+              const isTopTier = tier.tierNumber === 1;
+              const [champion, ...rest] = tier.players;
+              const gridPlayers = isTopTier ? rest : tier.players;
+
+              return (
+                <section key={tier.tierNumber}>
+                  <h2 className="mb-3 flex items-baseline gap-2 text-xl font-semibold text-amber-400">
+                    Tier {tier.tierNumber}
+                    <span className="text-sm font-normal text-zinc-500">
+                      {tier.players.length} player{tier.players.length === 1 ? "" : "s"}
+                    </span>
+                  </h2>
+
+                  {isTopTier && champion && (
+                    <div className="mb-3 flex items-center justify-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 p-4">
+                      <span className="text-2xl" aria-hidden>
+                        👑
+                      </span>
+                      <p className="text-lg font-semibold text-amber-300">{champion.gamertag}</p>
                     </div>
-                  ))}
-                </div>
-              </section>
-            ))}
+                  )}
+
+                  {gridPlayers.length > 0 && (
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {gridPlayers.map((player) => (
+                        <div
+                          key={player.id}
+                          className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
+                        >
+                          <p className="font-medium text-zinc-50">{player.gamertag}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
           </div>
         )}
       </main>
