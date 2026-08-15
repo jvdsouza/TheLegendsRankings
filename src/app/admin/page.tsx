@@ -4,22 +4,36 @@ import { computeTiers } from "@/lib/tiers";
 import { addPlayer } from "./actions";
 import PlayerRow from "./player-row";
 import SettingsForm from "./settings-form";
+import SeasonForm from "./season-form";
 
 export default async function AdminPage() {
   const supabase = await createClient();
 
   const [{ data: playerData }, { data: settingsData }] = await Promise.all([
-    supabase.from("players").select("id, gamertag, rank_position").order("rank_position", { ascending: true }),
-    supabase.from("settings").select("tier_size, fill_direction").eq("id", 1).single(),
+    supabase
+      .from("players")
+      .select("id, gamertag, rank_position, previous_tier, season_status")
+      .order("rank_position", { ascending: true }),
+    supabase
+      .from("settings")
+      .select("tier_size, fill_direction, season_backup_available")
+      .eq("id", 1)
+      .single(),
   ]);
 
-  const settings: Settings = settingsData ?? { tier_size: 6, fill_direction: "bottom_up" };
+  const settings: Settings = settingsData ?? {
+    tier_size: 6,
+    fill_direction: "bottom_up",
+    season_backup_available: false,
+  };
   const players = (playerData ?? []) as Player[];
   const tiers = computeTiers(players, settings.tier_size, settings.fill_direction);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">
       <SettingsForm settings={settings} />
+
+      <SeasonForm seasonBackupAvailable={settings.season_backup_available} />
 
       <section>
         <h2 className="mb-3 text-base font-semibold text-zinc-50">Add player</h2>

@@ -55,7 +55,15 @@ export default function PlayerRow({
 
   return (
     <li className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
-      <span className="flex-1 font-medium text-zinc-50">{player.gamertag}</span>
+      <span className="flex-1 font-medium text-zinc-50">
+        {player.gamertag}
+        {player.season_status === "promoted" && (
+          <span className="ml-2 text-sm font-medium text-green-400">↑ Promoted</span>
+        )}
+        {player.season_status === "demoted" && (
+          <span className="ml-2 text-sm font-medium text-red-400">↓ Demoted</span>
+        )}
+      </span>
       <div className="flex items-center gap-1">
         <button
           type="button"

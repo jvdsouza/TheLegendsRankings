@@ -8,11 +8,22 @@ export default async function Home() {
   const supabase = await createClient();
 
   const [{ data: playerData }, { data: settingsData }] = await Promise.all([
-    supabase.from("players").select("id, gamertag, rank_position").order("rank_position", { ascending: true }),
-    supabase.from("settings").select("tier_size, fill_direction").eq("id", 1).single(),
+    supabase
+      .from("players")
+      .select("id, gamertag, rank_position, previous_tier, season_status")
+      .order("rank_position", { ascending: true }),
+    supabase
+      .from("settings")
+      .select("tier_size, fill_direction, season_backup_available")
+      .eq("id", 1)
+      .single(),
   ]);
 
-  const settings: Settings = settingsData ?? { tier_size: 6, fill_direction: "bottom_up" };
+  const settings: Settings = settingsData ?? {
+    tier_size: 6,
+    fill_direction: "bottom_up",
+    season_backup_available: false,
+  };
   const players = (playerData ?? []) as Player[];
   const tiers = computeTiers(players, settings.tier_size, settings.fill_direction);
 
@@ -58,14 +69,38 @@ export default async function Home() {
 
                   {gridPlayers.length > 0 && (
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {gridPlayers.map((player) => (
-                        <div
-                          key={player.id}
-                          className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
-                        >
-                          <p className="font-medium text-zinc-50">{player.gamertag}</p>
-                        </div>
-                      ))}
+                      {gridPlayers.map((player) => {
+                        const cardClass =
+                          player.season_status === "promoted"
+                            ? "rounded-lg border border-green-500/50 bg-green-500/10 p-4"
+                            : player.season_status === "demoted"
+                              ? "rounded-lg border border-red-500/50 bg-red-500/10 p-4"
+                              : "rounded-lg border border-zinc-800 bg-zinc-900/50 p-4";
+                        const nameClass =
+                          player.season_status === "promoted"
+                            ? "font-medium text-green-300"
+                            : player.season_status === "demoted"
+                              ? "font-medium text-red-300"
+                              : "font-medium text-zinc-50";
+
+                        return (
+                          <div key={player.id} className={cardClass}>
+                            <p className={nameClass}>
+                              {player.season_status === "promoted" && (
+                                <span className="mr-1.5 text-green-400" aria-hidden>
+                                  ↑
+                                </span>
+                              )}
+                              {player.season_status === "demoted" && (
+                                <span className="mr-1.5 text-red-400" aria-hidden>
+                                  ↓
+                                </span>
+                              )}
+                              {player.gamertag}
+                            </p>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </section>
