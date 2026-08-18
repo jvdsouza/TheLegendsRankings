@@ -29,6 +29,8 @@ Rankings for The Legends local hosted by CryingLegend.
 - `supabase/schemas/players.sql` - declarative table definition (source of truth)
 - `supabase/migrations/` - versioned SQL applied via `supabase db push`
 - `supabase/config.toml` - Supabase CLI config
+- `.husky/pre-push` - pushes pending migrations to the hosted project before
+  `git push` to `main` is allowed to proceed (see "CI/CD" below)
 
 ## Local setup
 
@@ -87,6 +89,44 @@ npm run dev
    settings (Settings > Environment Variables).
 4. Deploy. The Supabase free tier and Vercel's hobby tier cover this project's
    scale at no cost.
+
+## CI/CD
+
+Vercel deploys the app automatically on every push to `main` via its GitHub
+integration - there's no build step in this repo for that. But Vercel only
+deploys *code*; it has no idea about `supabase/migrations/`. If a migration
+adds a column the code now depends on and the migration hasn't been pushed to
+the hosted database, the deployed app will fail to query that column - the
+symptom looks like "data disappeared" even though it's untouched in the
+database.
+
+`.husky/pre-push` closes that gap on the client side: any push whose target
+ref is `refs/heads/main` first runs `npx supabase db push` against the linked
+hosted project (see "Create a Supabase project" above for `login`/`link`
+setup). If the migration push fails, the hook exits non-zero and the `git
+push` is aborted - so code can't reach `main` (and therefore Vercel) with
+schema changes it depends on left unapplied. The hook is installed
+automatically by the `prepare` script in `package.json` the first time anyone
+runs `npm install`, via [Husky](https://typicode.github.io/husky/).
+
+Two things to know:
+
+- This only protects pushes made from a machine with the hook installed. It's
+  bypassable with `git push --no-verify`. Fine for this project's single/small
+  maintainer setup; wouldn't be a real gate on a larger team without also
+  enforcing migrations server-side.
+- Because it runs locally rather than in CI, there's no server-side
+  enforcement if someone pushes from an environment where `npm install` never
+  ran (and thus the hook was never installed).
+
+### Testing migrations before pushing
+
+`npm run test:migrations` applies every migration in `supabase/migrations/`
+from scratch against a local Postgres instance (via `supabase start`, which
+uses Docker) instead of the hosted project. Run it after adding a new
+migration to catch broken SQL - a syntax error or bad constraint - without
+risking a partially-applied `supabase db push` against the real database.
+Requires Docker to be running locally.
 
 ## How tiers are computed
 
