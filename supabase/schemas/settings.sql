@@ -1,9 +1,10 @@
 create table if not exists public.settings (
   id integer primary key default 1,
-  tier_size integer not null default 6,
-  fill_direction text not null default 'bottom_up',
+  tier_sizes integer[] not null default '{6}',
   season_backup_available boolean not null default false,
   constraint settings_singleton check (id = 1),
-  constraint settings_tier_size check (tier_size >= 1 and tier_size <= 20),
-  constraint settings_fill_direction check (fill_direction in ('bottom_up', 'top_down'))
+  constraint settings_tier_sizes_not_empty check (array_length(tier_sizes, 1) >= 1)
 );
+
+grant select on public.settings to anon, authenticated;
+grant update on public.settings to authenticated;

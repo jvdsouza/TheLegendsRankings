@@ -14,23 +14,19 @@ export default async function Home() {
       .order("rank_position", { ascending: true }),
     supabase
       .from("settings")
-      .select("tier_size, fill_direction, season_backup_available")
+      .select("tier_sizes, season_backup_available")
       .eq("id", 1)
       .single(),
   ]);
 
   const settings: Settings = settingsData ?? {
-    tier_size: 6,
-    fill_direction: "bottom_up",
+    tier_sizes: [6],
     season_backup_available: false,
   };
   const players = (playerData ?? []) as Player[];
-  const tiers = computeTiers(players, settings.tier_size, settings.fill_direction);
+  const tiers = computeTiers(players, settings.tier_sizes);
 
-  const footerText =
-    settings.fill_direction === "top_down"
-      ? `Tiers fill top-down in groups of ${settings.tier_size}; the bottom tier holds any remainder.`
-      : `Tiers fill bottom-up in groups of ${settings.tier_size}; the top tier holds any remainder.`;
+  const footerText = `Tier sizes: ${settings.tier_sizes.join(", ")} - everyone else falls into the last tier.`;
 
   return (
     <div className="flex flex-1 flex-col">

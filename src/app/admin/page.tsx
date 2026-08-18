@@ -16,18 +16,17 @@ export default async function AdminPage() {
       .order("rank_position", { ascending: true }),
     supabase
       .from("settings")
-      .select("tier_size, fill_direction, season_backup_available")
+      .select("tier_sizes, season_backup_available")
       .eq("id", 1)
       .single(),
   ]);
 
   const settings: Settings = settingsData ?? {
-    tier_size: 6,
-    fill_direction: "bottom_up",
+    tier_sizes: [6],
     season_backup_available: false,
   };
   const players = (playerData ?? []) as Player[];
-  const tiers = computeTiers(players, settings.tier_size, settings.fill_direction);
+  const tiers = computeTiers(players, settings.tier_sizes);
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8">

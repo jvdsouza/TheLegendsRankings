@@ -1,0 +1,32 @@
+insert into public.players
+  (id, gamertag, rank_position, created_at, previous_tier, season_status, previous_tier_backup, season_status_backup)
+values
+  ('efc04db8-ccba-4198-b7b7-0f3ea7314272', 'Corinthiax', 4, '2026-06-27 13:51:48.428597+00', 1, null, null, null),
+  ('fbb848e9-e95f-4cce-b11e-6059c123ef3f', 'Pandemedge', 3, '2026-06-27 13:52:16.394164+00', 1, null, null, null),
+  ('0cc30ecb-3a01-4899-b7a1-582944e9ee4e', '3rd', 15, '2026-06-27 13:52:57.89327+00', 3, null, null, null),
+  ('c256a87b-a3f7-4b1b-a1bc-9f6504573d43', 'Goat_moose', 13, '2026-06-27 13:53:47.325116+00', 2, null, null, null),
+  ('e23fe834-3fd6-4298-b52e-8aff14bcb88f', 'Cygnus', 11, '2026-06-27 13:52:27.574561+00', 2, null, null, null),
+  ('506a1ce3-75cb-40b2-9938-7e2b37196a34', 'Mash Tyrant | Akiba', 8, '2026-06-27 13:51:37.343899+00', 1, null, null, null),
+  ('5d497fc1-cfac-4ea4-a496-794724724673', 'Basilisk', 19, '2026-06-27 13:54:13.284787+00', 3, null, null, null),
+  ('70da4063-6410-4430-9c4e-57c314d1eaee', 'Donny', 18, '2026-06-27 13:53:52.096616+00', 3, null, null, null),
+  ('10e3f807-20ea-4c44-8437-dddee0905fec', 'Ravla187', 20, '2026-08-15 02:31:32.234614+00', 4, null, null, null),
+  ('eb5ce4cf-cf5e-4fba-8ffe-a54c112e5315', 'FENT | DBF', 14, '2026-06-27 13:52:49.079967+00', 2, null, null, null),
+  ('9829a7dc-9b66-41cd-a3c7-0855b4ffad28', 'Guy', 17, '2026-06-27 13:53:25.212098+00', 3, null, null, null),
+  ('e40f7dc9-ce9c-4499-98b8-d626df0bfba0', 'Dondyldo', 10, '2026-06-27 13:51:24.117549+00', 2, null, null, null),
+  ('35ca49c8-3f65-447c-b58e-5962f2ee5070', 'Crying Legend', 9, '2026-08-15 02:43:04.458247+00', 1, null, null, null),
+  ('84122a94-df04-48e7-b81e-2d9d8a11edb3', 'Drunkenmonk', 12, '2026-06-27 13:53:08.593586+00', 2, null, null, null),
+  ('f4aa7206-00e3-4a3e-9bbf-935da0786708', 'Rq', 6, '2026-06-27 13:53:20.548585+00', 1, null, null, null),
+  ('113b6d53-2cb0-4e49-bba2-de7e8cc95ddf', 'DJ_FLICKERZ', 16, '2026-08-15 02:27:59.144741+00', 3, null, null, null),
+  ('1e3e30a3-940f-41d0-bc66-eb4f0769920d', 'Mash_9otato', 32, '2026-08-15 14:08:28.222338+00', 6, null, null, null),
+  ('c4d7adff-f6f4-4a9a-994d-c026633e10b8', 'Muzzlebuzzle', 31, '2026-08-15 02:28:32.70871+00', 6, null, null, null),
+  ('ff2b0a9a-29fb-42b7-8bee-4741f9e46ef4', 'Alan', 30, '2026-06-27 13:54:31.621372+00', 5, null, null, null),
+  ('c8d70cdf-898f-44c3-b6f5-a0282a0ddc07', 'End3rW1z', 29, '2026-08-15 03:44:10.66141+00', 5, null, null, null),
+  ('ec8fe536-8b25-4820-9a2a-98e808fb5d32', 'W | Jix', 28, '2026-08-15 02:31:05.590396+00', 5, null, null, null),
+  ('74cde448-61b6-4d7b-8141-4a7db6aaf5c0', 'Sparky', 27, '2026-08-15 14:11:14.594743+00', 5, null, null, null),
+  ('e3b387f6-70bc-46f5-8b41-c2249ba95817', 'SWIN | LOGICOMA', 26, '2026-08-15 02:29:26.04526+00', 5, null, null, null),
+  ('8ec86900-c9c1-4572-8a3c-dbbe5a5e6c00', 'Shungite | Egg', 25, '2026-06-27 13:54:27.813495+00', 4, null, null, null),
+  ('8de08034-314a-4148-8778-5047da2a3980', 'AFT | Julian', 24, '2026-08-15 02:32:17.180669+00', 4, null, null, null),
+  ('2c6b177b-cd75-423e-92e9-9a2552574d4f', 'DHT | Defiance', 23, '2026-06-27 13:54:19.448148+00', 4, null, null, null),
+  ('15ba3eba-01d1-486b-9327-044b2e6de726', 'Azrail', 21, '2026-08-15 14:24:51.528865+00', null, null, null, null),
+  ('e729ccd6-fa2a-409e-8741-709d88d70780', 'Chococlass33', 22, '2026-08-15 02:32:57.801135+00', 4, null, null, null)
+on conflict (id) do nothing;

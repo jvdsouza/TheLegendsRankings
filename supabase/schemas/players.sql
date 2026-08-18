@@ -10,3 +10,6 @@ create table if not exists public.players (
 );
 
 create index if not exists players_rank_position_idx on public.players (rank_position);
+
+grant select on public.players to anon, authenticated;
+grant insert, update, delete on public.players to authenticated;

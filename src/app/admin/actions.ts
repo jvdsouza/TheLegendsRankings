@@ -53,17 +53,13 @@ export async function deletePlayer(id: string) {
 }
 
 export async function updateSettings(formData: FormData) {
-  const tierSize = parseInt(formData.get("tier_size") as string, 10);
-  const fillDirection = formData.get("fill_direction") as string;
+  const tierSizes = formData.getAll("tier_size").map((value) => parseInt(value as string, 10));
 
-  if (!Number.isInteger(tierSize) || tierSize < 1 || tierSize > 20) return;
-  if (fillDirection !== "bottom_up" && fillDirection !== "top_down") return;
+  if (tierSizes.length === 0) return;
+  if (tierSizes.some((size) => !Number.isInteger(size) || size < 1 || size > 100)) return;
 
   const supabase = await createClient();
-  await supabase
-    .from("settings")
-    .update({ tier_size: tierSize, fill_direction: fillDirection })
-    .eq("id", 1);
+  await supabase.from("settings").update({ tier_sizes: tierSizes }).eq("id", 1);
 
   revalidatePath("/admin");
   revalidatePath("/");
@@ -95,8 +91,8 @@ export async function movePlayer(id: string, direction: "up" | "down") {
   revalidatePath("/");
 }
 
-// NOTE: tier numbers are recomputed from the *current* tier_size/fill_direction settings.
-// If those settings change in the same sitting as a season update, tier numbers can shift
+// NOTE: tier numbers are recomputed from the *current* tier_sizes setting. If that
+// setting changes in the same sitting as a season update, tier numbers can shift
 // for reasons unrelated to actual roster movement, which would show up as spurious
 // promotions/demotions.
 export async function applySeasonUpdate() {
@@ -107,13 +103,13 @@ export async function applySeasonUpdate() {
       .from("players")
       .select("id, gamertag, rank_position, previous_tier, season_status")
       .order("rank_position", { ascending: true }),
-    supabase.from("settings").select("tier_size, fill_direction").eq("id", 1).single(),
+    supabase.from("settings").select("tier_sizes").eq("id", 1).single(),
   ]);
 
   if (!playerData || !settingsData) return;
 
   const players = playerData as Player[];
-  const tiers = computeTiers(players, settingsData.tier_size, settingsData.fill_direction);
+  const tiers = computeTiers(players, settingsData.tier_sizes);
 
   const tierByPlayerId = new Map<string, number>();
   for (const tier of tiers) {

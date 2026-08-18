@@ -8,10 +8,7 @@ export type Player = {
   season_status: SeasonStatus | null;
 };
 
-export type FillDirection = "bottom_up" | "top_down";
-
 export type Settings = {
-  tier_size: number;
-  fill_direction: FillDirection;
+  tier_sizes: number[];
   season_backup_available: boolean;
 };
